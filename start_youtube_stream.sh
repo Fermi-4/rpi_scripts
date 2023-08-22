@@ -4,16 +4,19 @@ usage() {
   echo "Options:"
   echo "  -u <url>    RTMP url sink"
   echo "  -k <key>    Stream key"
+  echo "  -d <device> Device to stream (i.e. /dev/video0)"
   exit 1
 }
 
 url=""
 key=""
-opts="u:k:"
+device="/dev/video0"
+opts="u:k:d:"
 while getopts "${opts}" opt; do
     case $opt in
 	u)  url=$OPTARG;;
 	k)  key=$OPTARG;;
+	d)  device=$OPTARG;;
 	\?) echo "Invalid option: -$OPTARG" >&2
 	    usage;;
 	:)  echo "Option -$OPTARG requires an argument." >&2
@@ -21,9 +24,9 @@ while getopts "${opts}" opt; do
     esac
 done
 
-echo "[INFO]: Using URL ${url}/${key}"
+echo "[INFO]: Using URL/KEY/DEVICE [${url}/${key}/${device}]"
 
-gst-launch-1.0 -v v4l2src device=/dev/video0 \
+gst-launch-1.0 -v v4l2src device=$device \
 ! video/x-raw,width=640,height=480,framerate=30/1 \
 ! videoflip video-direction=180  \
 ! x264enc speed-preset=ultrafast \
